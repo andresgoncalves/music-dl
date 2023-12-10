@@ -3,6 +3,7 @@ from flask import Flask, Response, request, send_file
 from flask_cors import CORS
 from pathlib import Path
 import os
+import sys
 
 from deezer import Deezer
 from youtube import Youtube
@@ -79,7 +80,9 @@ def api_download(track_id, video_id):
 
 if __name__ == "__main__":
     CORS(app)
-    app.run(host='0.0.0.0', port=int(os.getenv("PORT", "5000")))
+
     for path in downloads_path.glob("*"):
-        if path.is_file and path.suffix != ".mp3":
+        if path.is_file and ("clear-cache" in sys.argv or path.suffix != ".mp3"):
             os.remove(path)
+    if "clear-cache" not in sys.argv:
+        app.run(host='0.0.0.0', port=int(os.getenv("PORT", "3000")))
